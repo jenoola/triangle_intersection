@@ -1,7 +1,7 @@
 #include "intersection_private.hpp"
 
 namespace triangle_intersection {
-    double get_determinant_3d(double p1[3], double p2[3], double p3[3], double p4[3]) noexcept {
+    double get_determinant_3d(double p1[3], double p2[3], double p3[3], double p4[3]) {
         /*
         a b c
         d e f = aei + bfg + cdh - ceg - bdi - afh
@@ -17,7 +17,7 @@ namespace triangle_intersection {
             - (m[0][2] * m[1][1] * m[2][0]) - (m[0][1] * m[1][0] * m[2][2]) - (m[0][0] * m[1][2] * m[2][1]);
     }
 
-    double get_determinant_2d(double p1[2], double p2[2], double p3[2]) noexcept {
+    double get_determinant_2d(double p1[2], double p2[2], double p3[2]) {
         double m[2][2] = {
             { p1[0] - p3[0], p1[1] - p3[1] },
             { p2[0] - p3[0], p2[1] - p3[1] }
@@ -26,7 +26,7 @@ namespace triangle_intersection {
         return m[0][0] * m[1][1] - m[0][1] * m[1][0];
     }
 
-    void reorder_points(double t1[9], double t2[9], double d1[3], double d2[3]) noexcept {
+    void reorder_points(double t1[9], double t2[9], double d1[3], double d2[3]) {
 
         auto circular_permutation = [] (double t[9], double d[3]) {
             if ((d[1] == 0 && ((d[0] > 0 && d[2] > 0) || (d[0] < 0 && d[2] < 0)))
@@ -72,11 +72,11 @@ namespace triangle_intersection {
         }
     }
 
-    bool is_point(double t[9]) noexcept {
+    bool is_point(double t[9]) {
         return t[0] == t[3] && t[0] == t[6] && t[1] == t[4] && t[1] == t[7] && t[2] == t[5] && t[2] == t[8];
     }
 
-    bool is_segment(double t[9]) noexcept {
+    bool is_segment(double t[9]) {
         double l1 = get_length(t, t + 3);
         double l2 = get_length(t, t + 6);
         double l3 = get_length(t + 3, t + 6);
@@ -100,29 +100,29 @@ namespace triangle_intersection {
         return l1 == l2 + l3;
     }
 
-    double get_length(double p1[3], double p2[3]) noexcept {
+    double get_length(double p1[3], double p2[3]) {
         // L == sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2 + (z2 - z1) ^ 2)
         return std::sqrt(pow(p2[0] - p1[0], 2.0) + pow(p2[1] - p1[1], 2.0) + pow(p2[2] - p1[2], 2.0));
     };
 
-    void cross_product(double v1[3], double v2[3], double cp[3]) noexcept {
+    void cross_product(double v1[3], double v2[3], double cp[3]) {
         cp[0] = v1[1] * v2[2] - v1[2] * v2[1];
         cp[1] = v1[2] * v2[0] - v1[0] * v2[2];
         cp[2] = v1[0] * v2[1] - v1[1] * v2[0];
     };
 
-    double dot_product(double v1[3], double v2[3]) noexcept {
+    double dot_product(double v1[3], double v2[3]) {
         return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
     };
 
-    void make_couterclockwise_2d(double t[6]) noexcept {
+    void make_couterclockwise_2d(double t[6]) {
         if (get_determinant_2d(t, t + 2, t + 4) < 0) {
             std::swap(t[2], t[4]);
             std::swap(t[3], t[5]);
         }
     }
 
-    int get_dominant_axis(double t[9]) noexcept {
+    int get_dominant_axis(double t[9]) {
         double n[3] = {
             (t[4] - t[1]) * (t[8] - t[2]) - (t[5] - t[2]) * (t[7] - t[1]),
             (t[5] - t[2]) * (t[6] - t[0]) - (t[3] - t[0]) * (t[8] - t[2]),
@@ -136,7 +136,7 @@ namespace triangle_intersection {
         return abs(n[1]) > abs(n[2]) ? 1 : 2;
     };
 
-    void project_t_2d(double t1[9], double t2[6], int drop) noexcept {
+    void project_t_2d(double t1[9], double t2[6], int drop) {
         int j = 0;
         for (int i = 0; i < 9; i++) {
             if (i % 3 == drop) {
@@ -147,7 +147,7 @@ namespace triangle_intersection {
         }
     }
     
-    void project_p_2d(double p1[3], double p2[2], int drop) noexcept {
+    void project_p_2d(double p1[3], double p2[2], int drop) {
         if (drop == 0) {
             p2[0] = p1[1];
             p2[1] = p1[2];
@@ -157,7 +157,7 @@ namespace triangle_intersection {
         }
     }
     
-    bool is_same_side(double sp1[2], double sp2[2], double p1[2], double p2[2]) noexcept {
+    bool is_same_side(double sp1[2], double sp2[2], double p1[2], double p2[2]) {
         double d1 = get_determinant_2d(sp1, sp2, p1);
         double d2 = get_determinant_2d(sp1, sp2, p2);
 

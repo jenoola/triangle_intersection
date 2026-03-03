@@ -2,69 +2,73 @@
 
 namespace triangle_intersection {
     bool have_intersection(double t1[9], double t2[9]) noexcept {
-        if (is_point(t1)) {
+        try {
+            if (is_point(t1)) {
+                if (is_point(t2)) {
+                    return have_intersection_p_p(t1, t2);
+                }
+                if (is_segment(t2)) {
+                    return have_intersection_s_p(t2, t1);
+                }
+                return have_intersection_t_p(t2, t1);
+            }
+
             if (is_point(t2)) {
-                return have_intersection_p_p(t1, t2);
+                if (is_segment(t1)) {
+                    return have_intersection_s_p(t1, t2);
+                }
+                return have_intersection_t_p(t1, t2);
             }
-            if (is_segment(t2)) {
-                return have_intersection_s_p(t2, t1);
-            }
-            return have_intersection_t_p(t2, t1);
-        }
 
-        if (is_point(t2)) {
             if (is_segment(t1)) {
-                return have_intersection_s_p(t1, t2);
+                if (is_segment(t2)) {
+                    return have_intersection_s_s(t1, t2);
+                }
+                return have_intersection_t_s(t2, t1);
             }
-            return have_intersection_t_p(t1, t2);
-        }
 
-        if (is_segment(t1)) {
             if (is_segment(t2)) {
-                return have_intersection_s_s(t1, t2);
+                return have_intersection_t_s(t1, t2);
             }
-            return have_intersection_t_s(t2, t1);
-        }
 
-        if (is_segment(t2)) {
-            return have_intersection_t_s(t1, t2);
-        }
+            double d1[3] = { 
+                get_determinant_3d(t2, t2 + 3, t2 + 6, t1), 
+                get_determinant_3d(t2, t2 + 3, t2 + 6, t1 + 3), 
+                get_determinant_3d(t2, t2 + 3, t2 + 6, t1 + 6)
+            };
 
-        double d1[3] = { 
-            get_determinant_3d(t2, t2 + 3, t2 + 6, t1), 
-            get_determinant_3d(t2, t2 + 3, t2 + 6, t1 + 3), 
-            get_determinant_3d(t2, t2 + 3, t2 + 6, t1 + 6)
-        };
+            if (d1[0] == 0 && d1[1] == 0 && d1[2] == 0) {
+                return have_intersection_coplanar_t_t(t1, t2);
+            }
 
-        if (d1[0] == 0 && d1[1] == 0 && d1[2] == 0) {
-            return have_intersection_coplanar_t_t(t1, t2);
-        }
+            if ((d1[0] < 0 && d1[1] < 0 && d1[2] < 0) || (d1[0] > 0 && d1[1] > 0 && d1[2] > 0)) {
+                return false;
+            }
 
-        if ((d1[0] < 0 && d1[1] < 0 && d1[2] < 0) || (d1[0] > 0 && d1[1] > 0 && d1[2] > 0)) {
+            double d2[3] = {
+                get_determinant_3d(t1, t1 + 3, t1 + 6, t2), 
+                get_determinant_3d(t1, t1 + 3, t1 + 6, t2 + 3),
+                get_determinant_3d(t1, t1 + 3, t1 + 6, t2 + 6)
+            };
+
+            if ((d2[0] < 0 && d2[1] < 0 && d2[2] < 0) || (d2[0] > 0 && d2[1] > 0 && d2[2] > 0)) {
+                return false;
+            }
+
+            reorder_points(t1, t2, d1, d2);
+
+            double d[2] = {
+                get_determinant_3d(t1, t1 + 3, t2, t2 + 3),
+                get_determinant_3d(t1, t1 + 6, t2 + 6, t2)
+            };
+
+            return d[0] >= 0 && d[1] >= 0;
+        } catch (...) {
             return false;
         }
-
-        double d2[3] = {
-            get_determinant_3d(t1, t1 + 3, t1 + 6, t2), 
-            get_determinant_3d(t1, t1 + 3, t1 + 6, t2 + 3),
-            get_determinant_3d(t1, t1 + 3, t1 + 6, t2 + 6)
-        };
-
-        if ((d2[0] < 0 && d2[1] < 0 && d2[2] < 0) || (d2[0] > 0 && d2[1] > 0 && d2[2] > 0)) {
-            return false;
-        }
-
-        reorder_points(t1, t2, d1, d2);
-
-        double d[2] = {
-            get_determinant_3d(t1, t1 + 3, t2, t2 + 3),
-            get_determinant_3d(t1, t1 + 6, t2 + 6, t2)
-        };
-
-        return d[0] >= 0 && d[1] >= 0;
     }
 
-    bool have_intersection_t_s(double t[9], double s[6]) noexcept {
+    bool have_intersection_t_s(double t[9], double s[6]) {
         double edge1[3] = { t[3] - t[0], t[4] - t[1], t[5] - t[2] };
         double edge2[3] = { t[6] - t[0], t[7] - t[1], t[8] - t[2] };
 
@@ -122,7 +126,7 @@ namespace triangle_intersection {
         return have_intersection_s_p(s, cross_point);
     }
     
-    bool have_intersection_s_s(double s1[6], double s2[6]) noexcept {
+    bool have_intersection_s_s(double s1[6], double s2[6]) {
         double dir1[3] = { s1[3] - s1[0], s1[4] - s1[1], s1[5] - s1[2] };
         double dir2[3] = { s2[3] - s2[0], s2[4] - s2[1], s2[5] - s2[2] };
         double v[3] = { s1[0] - s2[0], s1[1] - s2[1], s1[2] - s2[2] };
@@ -158,7 +162,7 @@ namespace triangle_intersection {
         return dot_product(dist, dist) <= EPS * EPS;
     }
 
-    bool have_intersection_t_p(double t[9], double p[3]) noexcept {
+    bool have_intersection_t_p(double t[9], double p[3]) {
         double v1[3] = { t[3] - t[0], t[4] - t[1], t[5] - t[2] };
         double v2[3] = { t[6] - t[0], t[7] - t[1], t[8] - t[2] };
         double u[3] = { p[0] - t[0], p[1] - t[1], p[2] - t[2] };
@@ -179,15 +183,15 @@ namespace triangle_intersection {
         return have_intersection_t_p_2d(t1, p1);
     }
 
-    bool have_intersection_s_p(double s[6], double p[3]) noexcept {
+    bool have_intersection_s_p(double s[6], double p[3]) {
         return get_length(s, s + 3) == get_length(s, p) + get_length(p, s + 3); 
     }
 
-    bool have_intersection_p_p(double p1[3], double p2[3]) noexcept {
+    bool have_intersection_p_p(double p1[3], double p2[3]) {
         return p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2];
     }
     
-    bool have_intersection_coplanar_t_t(double t1[9], double t2[9]) noexcept {
+    bool have_intersection_coplanar_t_t(double t1[9], double t2[9]) {
         int k = get_dominant_axis(t1);
         double t11[6], t21[6];
         project_t_2d(t1, t11, k);
@@ -295,7 +299,7 @@ namespace triangle_intersection {
         return false;
     }
 
-    bool have_intersection_s_s_2d(double s1[4], double s2[4]) noexcept {
+    bool have_intersection_s_s_2d(double s1[4], double s2[4]) {
         double d1[2] = {
             get_determinant_2d(s1, s1 + 2, s2),
             get_determinant_2d(s1, s1 + 2, s2 + 2)
@@ -309,7 +313,7 @@ namespace triangle_intersection {
                 && (d2[0] > 0 && d2[1] < 0) || (d2[0] < 0 && d2[1] > 0));
     }
     
-    bool have_intersection_t_p_2d(double t[6], double p[2]) noexcept {
+    bool have_intersection_t_p_2d(double t[6], double p[2]) {
         return is_same_side(t, t + 2, t + 4, p) 
             && is_same_side(t + 2, t + 4, t, p) 
             && is_same_side(t + 4, t, t + 2, p);
