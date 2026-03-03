@@ -2,11 +2,6 @@
 
 namespace triangle_intersection {
     double get_determinant_3d(double p1[3], double p2[3], double p3[3], double p4[3]) {
-        /*
-        a b c
-        d e f = aei + bfg + cdh - ceg - bdi - afh
-        g h i
-        */
         double m[3][3] = {
             { p1[0] - p4[0], p1[1] - p4[1], p1[2] - p4[2] },
             { p2[0] - p4[0], p2[1] - p4[1], p2[2] - p4[2] },
@@ -77,6 +72,12 @@ namespace triangle_intersection {
     }
 
     bool is_segment(double t[9]) {
+        
+        /* 
+        This function also reorders the points if necessary 
+        to have the segment endpoints stored at the neginning of the array 
+        */
+
         double l1 = get_length(t, t + 3);
         double l2 = get_length(t, t + 6);
         double l3 = get_length(t + 3, t + 6);
