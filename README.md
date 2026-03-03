@@ -1,4 +1,4 @@
-This repository contains code and tests for a C++ implementation of detection of a triangle intersection in 3D space. The function *have_intersection* returns **true** if an intersection is detected and **false** otherwise.
+This repository contains code and tests for a C++ implementation of detection of a triangle intersection in 3D space. The function *have_intersection* returns **true** if an intersection is detected and **false** otherwise. If an exception is caught, *have_intersection* return **false**.
 
 Main algorithm is implemented according to *Olivier Devillers, Philippe Guigue. Faster Triangle-Triangle Intersection Tests. RR-4488, INRIA. 2002. inria-00072100*
 
