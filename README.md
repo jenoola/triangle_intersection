@@ -4,3 +4,4 @@ Main algorithm is implemented according to *Olivier Devillers, Philippe Guigue. 
 
 Co-planar intersections are handled by impelementing *Möller–Trumbore ray-triangle intersection algorithm*. Degenerate cases (such as when a triangle turns out to be a point or a segment) are also handled.
 
+More tests are being added.
